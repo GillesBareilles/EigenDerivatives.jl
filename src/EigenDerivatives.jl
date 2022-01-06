@@ -81,7 +81,7 @@ end
 
 
 
-export g, Dg, D²g_ηl
+export g, Dg, Dgconj, D²g_ηl
 export update_refpoint!
 export U
 
@@ -111,11 +111,13 @@ end
 
 
 include("phi_ij.jl")
+include("h.jl")
 include("lagrangian.jl")
 
 include("affinemap/phi_ij.jl")
 
 export ϕᵢⱼ, ∇ϕᵢⱼ, ∇²ϕᵢⱼ
+export h, Dh, Jac_h
 export L, ∇L, ∇²L
 
 

@@ -26,6 +26,14 @@ function Dg(affmap::AffineMap{Tf}, x::Vector{Tf}, η::Vector{Tf}) where {Tf}
     return Symmetric(res)
 end
 
+function Dgconj(affmap::AffineMap{Tf}, x::Vector{Tf}, ξ::Symmetric{Tf}) where {Tf}
+    res = similar(x)
+    for (i, Aᵢ) in enumerate(affmap.As)
+        res[i] = dot(ξ, Aᵢ)
+    end
+    return res
+end
+
 function D²g_ηl(affmap::AffineMap{Tf}, x, η, l::Int64) where Tf
     return zeros(Tf, length(x))
 end

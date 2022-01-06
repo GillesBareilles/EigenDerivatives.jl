@@ -9,10 +9,12 @@ carried in `eigmult`.
 $$L(x, \lambda) = (1/r) \sum_{i=1}^r \lambda_i\circ A(x) + \langle \lambda, h(x)\rangle$$
 where $h(x)$ is zero exactly when $\lambda_i\circ A(x) = \ldots = \lambda_{i+r-1}\circ A(x)$.
 """
-function L(eigmult::EigMult, map::Tm, x::Vector{Tf}, λ::Matrix{Tf}) where {Tf, Tm<:AbstractMap{Tf}}
+function L(eigmult::EigMult, map::Tm, x::Vector{Tf}, λvec::Vector{Tf}) where {Tf, Tm<:AbstractMap{Tf}}
     res = Tf(0.0)
     r = eigmult.r
     @assert eigmult.i == 1
+
+    λ = reshape(λvec, (r, r))
 
     for i in 1:r, j in 1:r
         ϕij = ϕᵢⱼ(eigmult, map, x, i, j)
@@ -26,10 +28,12 @@ function L(eigmult::EigMult, map::Tm, x::Vector{Tf}, λ::Matrix{Tf}) where {Tf, 
     return res
 end
 
-function ∇L(eigmult::EigMult, map::Tm, x::Vector{Tf}, λ::Matrix{Tf}) where {Tf, Tm<:AbstractMap{Tf}}
+function ∇L(eigmult::EigMult, map::Tm, x::Vector{Tf}, λvec::Vector{Tf}) where {Tf, Tm<:AbstractMap{Tf}}
     res = zeros(Tf, size(x))
     r = eigmult.r
     @assert eigmult.i == 1
+
+    λ = reshape(λvec, (r, r))
 
     ∇ϕᵢⱼ_temp = similar(x)
     for i in 1:r, j in 1:r
@@ -44,10 +48,12 @@ function ∇L(eigmult::EigMult, map::Tm, x::Vector{Tf}, λ::Matrix{Tf}) where {T
     return res
 end
 
-function ∇²L(eigmult::EigMult, map::Tm, x::Vector{Tf}, λ::Matrix{Tf}, d::Vector{Tf}) where {Tf, Tm<:AbstractMap{Tf}}
+function ∇²L(eigmult::EigMult, map::Tm, x::Vector{Tf}, λvec::Vector{Tf}, d::Vector{Tf}) where {Tf, Tm<:AbstractMap{Tf}}
     res = zeros(Tf, size(x))
     r = eigmult.r
     @assert eigmult.i == 1
+
+    λ = reshape(λvec, (r, r))
 
     ∇²ϕᵢⱼ_temp = similar(x)
     for i in 1:r, j in 1:r
