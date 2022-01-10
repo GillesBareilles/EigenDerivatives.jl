@@ -116,7 +116,7 @@ include("lagrangian.jl")
 
 include("affinemap/phi_ij.jl")
 
-export ϕᵢⱼ, ∇ϕᵢⱼ, ∇²ϕᵢⱼ
+export ϕᵢⱼ, Dϕᵢⱼ, ∇ϕᵢⱼ, ∇²ϕᵢⱼ
 export h, Dh, Jac_h
 export L, ∇L, ∇²L
 

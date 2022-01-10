@@ -1,8 +1,8 @@
-struct NonLinearMap{Tf} <: AbstractMap{Tf}
+struct NonLinearMap{Tf, Tm1, Tm2} <: AbstractMap{Tf}
     n::Int64
     m::Int64
-    A₀::Symmetric{Tf}
-    As::Vector{Symmetric{Tf}}
+    A₀::Symmetric{Tf, Tm1}
+    As::Vector{Symmetric{Tf, Tm2}}
 end
 function g(nlmap::NonLinearMap{Tf}, x::Vector{Tf}) where {Tf}
     res = copy(nlmap.A₀.data)

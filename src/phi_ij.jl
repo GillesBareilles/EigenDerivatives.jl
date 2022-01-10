@@ -6,6 +6,18 @@ function ϕᵢⱼ(eigmult::EigMult, map::Tm, x::Vector{Tf}, i, j) where {Tf, Tm<
     return Uᵣ[:, i]' * gx * Uᵣ[:, j]
 end
 
+function Dϕᵢⱼ(eigmult::EigMult, map::Tm, x::Vector{Tf}, d, i, j) where {Tf, Tm<:AbstractMap{Tf}}
+    # The gradient can only be evaluated at the reference point. Hence, no explicit U
+    if eigmult.x̄ != x
+        @warn "∇ϕᵢⱼ should be evaluated at reference point. Setting it."
+        update_refpoint!(eigmult, map, x)
+    end
+
+    E = reverse(eigmult.Ē, dims = 2)
+
+    return E[:, i]' * Dg(map, x, d) * E[:, j]
+end
+
 function ∇ϕᵢⱼ(eigmult::EigMult, map::Tm, x::Vector{Tf}, i, j) where {Tf, Tm<:AbstractMap{Tf}}
     # The gradient can only be evaluated at the reference point. Hence, no explicit U
     if eigmult.x̄ != x
