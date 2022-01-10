@@ -70,7 +70,7 @@ function ∇²ϕᵢⱼ(eigmult::EigMult, map::Tm, x::Vector{Tf}, d::Vector{Tf}, 
 
     # Curvature of the map
     for l in axes(res, 1)
-        res[l] += E[:, i]' * D²g_ηl(map, x, d, l) * E[:, j]
+        res[l] += E[:, ♈(i)]' * D²g_ηl(map, x, d, l) * E[:, ♈(j)]
     end
 
     return res
