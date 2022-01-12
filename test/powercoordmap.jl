@@ -1,21 +1,20 @@
 using EigenDerivatives
-using Random
-using Test
 using LinearAlgebra
+using Test
 using PlotsOptim
+using Random
 
+include("genericmaptest.jl")
 
 @testset "Power coord map - Tf = $Tf" for Tf in [
     Float64,
     BigFloat
     ]
-    seed = 1643
-    n, m = 10, 5
-    A = EigenDerivatives.get_nlmap(n, m; Tf, seed)
+    n, m = 5, 5
+    A = get_powercoordmap(; n, m, Tf)
     x = rand(Tf, n)
     d = rand(Tf, n)
     φ(t) = x + t*d
 
-    test_map_goracles(A, x, d, n, "nlmap")
+    test_map_goracles(A, x, d, n, "powercoord")
 end
-

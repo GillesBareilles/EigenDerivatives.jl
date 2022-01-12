@@ -21,9 +21,14 @@ export EigMult
 
 include("affinemap/affinemap.jl")
 include("nlmap/nonlinearmap.jl")
+include("powercoordmap/powercoordmap.jl")
 
-export AffineMap, get_AL33_affinemap
+export AffineMap, get_AL33_affinemap, get_affinemap
+
 export NonLinearMap, get_nlmap
+
+export PowerCoordMap, get_powercoordmap
+
 
 """
     $TYPEDSIGNATURES
@@ -43,6 +48,11 @@ end
 function EigMult(i, r, x::AbstractVector{Tf}, affmap::AffineMap{Tf}) where Tf
     eigmult = EigMult(i, r, x .- 1, zeros(Tf, affmap.m, r))
     update_refpoint!(eigmult, affmap, x)
+    return eigmult
+end
+function EigMult(i, r, x::AbstractVector{Tf}, map::PowerCoordMap{Tf}) where Tf
+    eigmult = EigMult(i, r, x .- 1, zeros(Tf, map.m, r))
+    update_refpoint!(eigmult, map, x)
     return eigmult
 end
 function EigMult(i, r, x::AbstractVector{Tf}, nlmap::NonLinearMap{Tf}) where Tf
@@ -81,7 +91,7 @@ end
 
 
 
-export g, Dg, Dgconj, D²g_ηl
+export g, Dg, Dgconj, D²g_ηl, D²g
 export update_refpoint!
 export U
 
@@ -114,9 +124,9 @@ include("phi_ij.jl")
 include("h.jl")
 include("lagrangian.jl")
 
-include("affinemap/phi_ij.jl")
+# include("affinemap/phi_ij.jl")
 
-export ϕᵢⱼ, Dϕᵢⱼ, ∇ϕᵢⱼ, ∇²ϕᵢⱼ
+export ϕᵢⱼ, Dϕᵢⱼ, ∇ϕᵢⱼ, ∇²ϕᵢⱼ, D²ϕᵢⱼ
 export h, Dh, Jac_h
 export L, ∇L, ∇²L
 
