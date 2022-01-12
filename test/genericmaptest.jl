@@ -1,4 +1,4 @@
-function test_map_goracles(A, x::Vector{Tf}, d::Vector{Tf}, n, name) where {Tf}
+function test_map_goracles(A, x::Vector{Tf}, d::Vector{Tf}, n, name; print_Taylordevs=false) where {Tf}
     φ(t) = x + t * d
 
     @testset "g" begin
@@ -22,8 +22,10 @@ function test_map_goracles(A, x::Vector{Tf}, d::Vector{Tf}, n, name) where {Tf}
             model_to_functions["g - 2 - $l"] = (t -> norm(g(A, x + t * el) - g(A, x) - t * Dgxl - 0.5 * t^2 * D2gxl))
         end
 
-        fig = PlotsOptim.plot_taylordev(model_to_functions; Tf)
-        savefig(fig, "/tmp/$(name)_g_$(Tf)"; savetex = false)
+        if print_Taylordevs
+            fig = PlotsOptim.plot_taylordev(model_to_functions; Tf)
+            savefig(fig, "/tmp/$(name)_g_$(Tf)"; savetex = false)
+        end
         res = PlotsOptim.build_affinemodels(model_to_functions; Tf)
 
         @testset "$curve" for (curve, targetslope) in union(
@@ -61,8 +63,10 @@ function test_map_goracles(A, x::Vector{Tf}, d::Vector{Tf}, n, name) where {Tf}
             "phi k,l - 2" => t -> norm(ϕᵢⱼ(eigmult, A, φ(t), k, l) - ϕᵢⱼ(eigmult, A, φ(0), k, l) - t * dϕₖₗ - 0.5 * t^2 * d²ϕₖₗ),
         )
 
-        fig = PlotsOptim.plot_taylordev(model_to_functions; Tf)
-        savefig(fig, "/tmp/$(name)_phi_differential_$(Tf)"; savetex = false)
+        if print_Taylordevs
+            fig = PlotsOptim.plot_taylordev(model_to_functions; Tf)
+            savefig(fig, "/tmp/$(name)_phi_differential_$(Tf)"; savetex = false)
+        end
         res = PlotsOptim.build_affinemodels(model_to_functions; Tf)
 
         @testset "curve $curve" for (curve, targetslope) in [
@@ -100,8 +104,10 @@ function test_map_goracles(A, x::Vector{Tf}, d::Vector{Tf}, n, name) where {Tf}
             "phi k,l - 2" => t -> norm(ϕᵢⱼ(eigmult, A, φ(t), k, l) - ϕᵢⱼ(eigmult, A, φ(0), k, l) - t * cgradₖₗ - 0.5 * t^2 * chessₖₗ),
         )
 
-        fig = PlotsOptim.plot_taylordev(model_to_functions; Tf)
-        savefig(fig, "/tmp/$(name)_phi_gradient_$(Tf)"; savetex = false)
+        if print_Taylordevs
+            fig = PlotsOptim.plot_taylordev(model_to_functions; Tf)
+            savefig(fig, "/tmp/$(name)_phi_gradient_$(Tf)"; savetex = false)
+        end
         res = PlotsOptim.build_affinemodels(model_to_functions; Tf)
 
         @testset "curve $curve" for (curve, targetslope) in [
@@ -135,8 +141,10 @@ function test_map_goracles(A, x::Vector{Tf}, d::Vector{Tf}, n, name) where {Tf}
             "Lag - 2" => t -> norm(L(eigmult, A, φ(t), λ) - L(eigmult, A, x, λ) - t * cgrad - 0.5 * t^2 * chess),
         )
 
-        fig = PlotsOptim.plot_taylordev(model_to_functions; Tf)
-        savefig(fig, "/tmp/$(name)_lagrangian_$(Tf)"; savetex = false)
+        if print_Taylordevs
+            fig = PlotsOptim.plot_taylordev(model_to_functions; Tf)
+            savefig(fig, "/tmp/$(name)_lagrangian_$(Tf)"; savetex = false)
+        end
         res = PlotsOptim.build_affinemodels(model_to_functions; Tf)
 
         @testset "curve $curve" for (curve, targetslope) in [

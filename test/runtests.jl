@@ -1,8 +1,14 @@
-using Tests
+using Test
 using EigenDerivatives
+using LinearAlgebra
+using PlotsOptim
+using Random
 
+include("genericmaptest.jl")
 
 function runtests()
-    include("affinemap.jl")
-    include("lagrangian.jl")
+    include("test/affinemap.jl")
+    include("test/powercoordmap.jl")
+    include("test/nonlinearmap.jl")
+    return
 end

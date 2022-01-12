@@ -18,11 +18,11 @@ using Random
     @testset "ϕᵢⱼ derivatives" begin
         @testset "Tf=$Tf" for Tf in [
             Float64,
-            # BigFloat
+            BigFloat
             ]
             @testset "$s point" for (s, x, ϕth) in [
                 ("smooth", Tf[0.5, 0, 0, 0], [1.5 0.0; 0.0 0.5]),
-                # ("nonsmooth", Tf[parse(Tf, "1e-8"), 0, 0, 0], Tf[1 0.0; 0.0 1] + parse(Tf, "1e-8")*Diagonal{Tf}([1, -1]))
+                ("nonsmooth", Tf[parse(Tf, "1e-8"), 0, 0, 0], Tf[1 0.0; 0.0 1] + parse(Tf, "1e-8")*Diagonal{Tf}([1, -1]))
                 ]
 
                 A = get_AL33_affinemap(; Tf)
