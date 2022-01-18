@@ -18,7 +18,16 @@ g(map, x)
 Dg(map, x, η)
 D²g(map, x, η)
 ```
+Check out the docs!
 
+* Derivatives status
+The following are working:
+- affine mapping
+- powercoord mapping
+- nonlinear mapping
+Check by running the test scripts.
+
+* Principle
 
 - simple case:
   + $i$-th eigenvalue `λₖ∘g`:

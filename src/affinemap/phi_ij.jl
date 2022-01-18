@@ -1,7 +1,7 @@
 function ∇ϕᵢⱼ(eigmult::EigMult, affmap::AffineMap, x::Vector{Tf}, i, j) where {Tf}
     # The gradient can only be evaluated at the reference point. Hence, no explicit U
     if eigmult.x̄ != x
-        @warn "∇ϕᵢⱼ should be evaluated at reference point. Setting it."
+        @debug "∇ϕᵢⱼ should be evaluated at reference point. Setting it."
         update_refpoint!(eigmult, affmap, x)
     end
 
@@ -21,7 +21,7 @@ function ∇²ϕᵢⱼ(eigmult::EigMult, affmap::AffineMap, x::Vector{Tf}, d::Ve
 
     # The gradient can only be evaluated at the reference point. Hence, no explicit U
     if eigmult.x̄ != x
-        @warn "∇ϕᵢⱼ should be evaluated at reference point. Setting it."
+        @debug "∇ϕᵢⱼ should be evaluated at reference point. Setting it."
         update_refpoint!(eigmult, affmap, x)
     end
 

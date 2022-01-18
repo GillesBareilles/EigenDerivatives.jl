@@ -26,7 +26,7 @@ function Dg(map::AffineMap{Tf}, x::Vector{Tf}, η::Vector{Tf}) where {Tf}
     return Symmetric(res)
 end
 
-function Dgconj(map::AffineMap{Tf}, x::Vector{Tf}, ξ::Symmetric{Tf}) where {Tf}
+function Dgconj(map::AffineMap{Tf}, x::Vector{Tf}, ξ) where {Tf}
     res = [dot(ξ, Aᵢ) for Aᵢ in map.As]
     return res
 end

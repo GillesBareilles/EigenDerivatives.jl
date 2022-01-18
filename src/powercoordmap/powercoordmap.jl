@@ -26,7 +26,7 @@ function Dg(map::PowerCoordMap{Tf, k}, x::Vector{Tf}, η::Vector{Tf}) where {Tf,
     return Symmetric(res)
 end
 
-function Dgconj(map::PowerCoordMap{Tf, k}, x::Vector{Tf}, Η::Vector{Tf}) where {Tf, k}
+function Dgconj(map::PowerCoordMap{Tf, k}, x::Vector{Tf}, Η) where {Tf, k}
     res = [dot(Aᵢ, Η) for Aᵢ in map.As]
     res .*= k .* x.^(k-1)
     return res

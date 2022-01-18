@@ -21,7 +21,7 @@ function Dg(nlmap::NonLinearMap{Tf}, x::Vector{Tf}, η::Vector{Tf}) where {Tf}
     return Symmetric(res)
 end
 
-function Dgconj(map::NonLinearMap{Tf}, x::Vector{Tf}, Η::Vector{Tf}) where {Tf}
+function Dgconj(map::NonLinearMap{Tf}, x::Vector{Tf}, Η) where {Tf}
     res = [x[i]^(i-1) * dot(Aᵢ, Η) for (i, Aᵢ) in enumerate(map.As)]
     return res
 end
