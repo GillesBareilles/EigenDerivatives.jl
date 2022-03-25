@@ -7,8 +7,8 @@ using Random
 include("genericmaptest.jl")
 
 function runtests()
-    include("test/affinemap.jl")
+    # include("test/affinemap.jl")
     include("test/powercoordmap.jl")
-    include("test/nonlinearmap.jl")
+    # include("test/nonlinearmap.jl")
     return
 end

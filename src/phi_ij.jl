@@ -1,17 +1,15 @@
 function ϕᵢⱼ(eigmult::EigMult, map::Tm, x::Vector{Tf}, i, j) where {Tf, Tm<:AbstractMap{Tf}}
     gx = g(map, x)
-
-    E = eigvecs(gx)[:, end-eigmult.r+1:end]
-    Uᵣ = U(eigmult, E)
+    Uᵣ = U(eigmult, x, gx)
     return Uᵣ[:, i]' * gx * Uᵣ[:, j]
 end
 function Dϕᵢⱼ(eigmult::EigMult, map::Tm, x::Vector{Tf}, d, i, j) where {Tf, Tm<:AbstractMap{Tf}}
-    # The gradient can only be evaluated at the reference point. Hence, no explicit U
+    @assert eigmult.i == 1
     if eigmult.x̄ != x
         @debug "Dϕᵢⱼ should be evaluated at reference point. Setting it."
         update_refpoint!(eigmult, map, x)
     end
-    E = reverse(eigmult.Ē, dims = 2)
+    E = eigmult.Ē
 
     return E[:, i]' * Dg(map, x, d) * E[:, j]
 end
@@ -20,7 +18,6 @@ function D²ϕᵢⱼ(eigmult::EigMult, map::Tm, x::Vector{Tf}, η::Vector{Tf}, �
     r = eigmult.r
     m = map.m
 
-    # The gradient can only be evaluated at the reference point. Hence, no explicit U
     if eigmult.x̄ != x
         @debug "D²ϕᵢⱼ should be evaluated at reference point. Setting it."
         update_refpoint!(eigmult, map, x)
@@ -45,14 +42,14 @@ end
 
 
 function ∇ϕᵢⱼ(eigmult::EigMult, map::Tm, x::Vector{Tf}, i, j) where {Tf, Tm<:AbstractMap{Tf}}
-    # The gradient can only be evaluated at the reference point. Hence, no explicit U
+    @assert eigmult.i == 1
     if eigmult.x̄ != x
         @debug "∇ϕᵢⱼ should be evaluated at reference point. Setting it."
         update_refpoint!(eigmult, map, x)
     end
 
     res = zeros(Tf, size(x))
-    E = reverse(eigmult.Ē, dims = 2)
+    E = eigmult.Ē
 
     eₗ = zeros(Tf, length(x))
     for l in axes(res, 1)
@@ -68,7 +65,6 @@ function ∇²ϕᵢⱼ(eigmult::EigMult, map::Tm, x::Vector{Tf}, η::Vector{Tf},
     r = eigmult.r
     n, m = map.n, map.m
 
-    # The gradient can only be evaluated at the reference point. Hence, no explicit U
     if eigmult.x̄ != x
         @debug "∇²ϕᵢⱼ should be evaluated at reference point. Setting it."
         update_refpoint!(eigmult, map, x)
@@ -92,7 +88,3 @@ function ∇²ϕᵢⱼ(eigmult::EigMult, map::Tm, x::Vector{Tf}, η::Vector{Tf},
 
     return res
 end
-
-
-
-

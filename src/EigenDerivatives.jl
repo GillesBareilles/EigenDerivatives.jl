@@ -63,45 +63,22 @@ end
 
 
 
-"""
-    $TYPEDSIGNATURES
-
-Compute the eigenvalues and eigenvectors of `A` at indices `eigenvals_indices`.
-"""
-function get_eigendecomp(A::AbstractMatrix, eigenvals_indices::UnitRange{Int64})
-    λs, E = eigen(A)
-    return λs[eigenvals_indices], E[eigenvals_indices]
-end
-
-
-"""
-    $TYPEDSIGNATURES
-
-Compute a smooth basis from `E` with reference basis `Ē`. The resulting basis
-is equivalent to the first one, with reversed columns. In particular, the
-columns are sorted in decreasing order of corresponding eigenvalues.
-"""
-function U(coalescenceinds, E, Ē)
-    # NOTE: is this working for sthg other than max eigenval?
-    res = E * project(Stiefel(M.r, M.r), E' * Ē)
-    reverse!(res, dims=2)
-    return res
-end
-
-
-
-
 export g, Dg, Dgconj, D²g_ηl, D²g
 export update_refpoint!
 export U
 
 
-############################
+"""
+    $TYPEDSIGNATURES
+
+The columns are sorted in decreasing order of corresponding eigenvalues.
+"""
 function update_refpoint!(eigmult::EigMult{Tf}, map::Tm, x̄::Vector{Tf}) where {Tf, Tm<:AbstractMap}
     @assert eigmult.i == 1
     if eigmult.x̄ != x̄
         eigmult.x̄ .= x̄
         eigmult.Ē .= eigvecs(g(map, x̄))[:, end-eigmult.r+1:end]
+        reverse!(eigmult.Ē, dims=2)
     else
         @debug "Not updating ref point"
     end
@@ -110,25 +87,43 @@ function update_refpoint!(eigmult::EigMult{Tf}, map::Tm, x̄::Vector{Tf}) where 
 end
 
 
-function U(eigmult::EigMult, E) where Tf
-    r = eigmult.r
-    @assert eigmult.i == 1
+"""
+    $TYPEDSIGNATURES
 
-    res = E * project(Stiefel(r, r), E' * eigmult.Ē)
-    reverse!(res, dims=2)
-    return res
+Compute a smooth basis from `E` with reference basis `Ē`. The resulting basis
+is equivalent to the first one, with reversed columns.
+"""
+function U(eigmult::EigMult, x, gx)
+    @assert eigmult.i == 1
+    r = eigmult.r
+
+    if x == eigmult.x̄
+        return eigmult.Ē
+    else
+        E = eigvecs(gx)[:, end-eigmult.r+1:end]
+        reverse!(E, dims = 2)
+
+        return E * project(Stiefel(r, r), E' * eigmult.Ē)
+    end
 end
 
 
+
 include("phi_ij.jl")
-include("h.jl")
-include("lagrangian.jl")
+# include("h.jl")
+# include("lagrangian.jl")
+
+include("indicesmapping.jl")
+include("oraclesfullrank.jl")
+
+export hsize
+export h!, Dh!, Jacₕ!
+export F̃, ∇F̃!
+export Lagrangian, ∇L!, ∇²L!
 
 # include("affinemap/phi_ij.jl")
 
 export ϕᵢⱼ, Dϕᵢⱼ, ∇ϕᵢⱼ, ∇²ϕᵢⱼ, D²ϕᵢⱼ
-export h, Dh, Jac_h
-export L, ∇L, ∇²L
 
 
 end # module

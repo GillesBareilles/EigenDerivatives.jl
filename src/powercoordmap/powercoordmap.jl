@@ -1,7 +1,7 @@
 """
     $TYPEDSIGNATURES
 
-
+TODO
 """
 struct PowerCoordMap{Tf, k} <: AbstractMap{Tf}
     n::Int64
@@ -52,7 +52,14 @@ function D²g_ηl(map::PowerCoordMap{Tf, k}, x, η, l::Int64) where {Tf, k}
     return Symmetric(k*(k-1) * x[l]^(k-2) * η[l] .* map.As[l].data)
 end
 
-
+function D²g_kl(map::PowerCoordMap{Tf, e}, x, k::Int64, l::Int64) where {Tf, e}
+    if k == l
+        return Symmetric(e*(e-1) * x[l]^(k-2) .* map.As[l].data)
+    else
+        # return (Tf(0.0) * I)(length(x))
+        return 0 .* map.As[1].data
+    end
+end
 
 function get_powercoordmap(;n = 5, m = 5, k = 2, Tf = Float64)
     A₀ = Symmetric(rand(Tf, m, m))
