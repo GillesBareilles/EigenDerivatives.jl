@@ -6,7 +6,6 @@ function test_c(A, x::Vector{Tf}, d::Vector{Tf}, name; print_Taylordevs=false) w
         Dgxd = Dg(A, x, d)
         D²gxd = D²g(A, x, d, d)
 
-
         model_to_functions = OrderedDict{String,Function}(
             "t" => t -> t,
             "t2" => t -> t^2,
@@ -21,6 +20,7 @@ function test_c(A, x::Vector{Tf}, d::Vector{Tf}, name; print_Taylordevs=false) w
 
             Dgxl = Dg(A, x, el)
             D2gxl = D²g_ηl(A, x, el, l)
+            @test D2gxl ≈ EigenDerivatives.D²g_kl(A, x, l, l)
 
             model_to_functions["g - 2 - $l"] = (t -> norm(g(A, x + t * el) - g(A, x) - t * Dgxl - 0.5 * t^2 * D2gxl))
         end
@@ -165,6 +165,7 @@ function test_Linplace(map, x::Vector{Tf}, d::Vector{Tf}, name; print_Taylordevs
         model_to_functions = OrderedDict{String,Function}(
             "t" => t -> t,
             "t2" => t -> t^2,
+            "t3" => t -> t^3,
             "L - 1" => t -> norm(L(φ(t)) - Lx - t * ∇Lxd),
             "L - 2" => t -> norm(L(φ(t)) - Lx - t * ∇Lxd - 0.5 * t^2 * ∇²Lxd),
         )

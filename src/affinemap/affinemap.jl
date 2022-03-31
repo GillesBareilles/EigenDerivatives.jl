@@ -35,6 +35,10 @@ function D²g(map::AffineMap{Tf}, x, η, ξ) where Tf
     return zeros(Tf, size(map.A₀))
 end
 
+function D²g_kl(map::AffineMap{Tf}, x::Vector{Tf}, k::Int64, l::Int64) where {Tf}
+    return Diagonal(Tf(0) * I, size(map.As[1], 1))
+end
+
 ################################################################################
 #### Specialized derivatives
 ################################################################################
@@ -58,7 +62,7 @@ function get_AL33_affinemap(;Tf = Float64)
     return AffineMap{Tf}(4, 3, Symmetric(Tf.(A₀)), [Symmetric(Tf.(a)) for a in As])
 end
 
-function get_affinemap(;n = 5, m = 5, Tf = Float64)
+function get_affinemap(n = 5, m = 5; Tf = Float64)
     A₀ = Symmetric(rand(Tf, m, m))
     As = [ Symmetric(rand(Tf, m, m)) for i in 1:n ]
     return AffineMap{Tf}(n, m, A₀, As)

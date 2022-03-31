@@ -23,13 +23,13 @@ function D²ϕᵢⱼ(eigmult::EigMult, map::Tm, x::Vector{Tf}, η::Vector{Tf}, �
         update_refpoint!(eigmult, map, x)
     end
 
-    gx = @timeit_debug "g oracle" g(map, x)
-    λ, E = @timeit_debug "eigen" eigen(gx)
+    gx::Matrix{Tf} = g(map, x)
+    λ::Vector{Tf}, E::Matrix{Tf} = eigen(gx)
     reverse!(E, dims=2)
     reverse!(λ)
     τ(i, k, η) = E[:, i]' * Dg(map, x, η) * E[:, k]
 
-    res = E[:, i]' * D²g(map, x, η, ξ) * E[:, j]
+    res::Tf = E[:, i]' * D²g(map, x, η, ξ) * E[:, j]
     for k in r+1:m
         scalar = 0.5 * (1/(λ[i] - λ[k]) + 1/(λ[j] - λ[k]))
         res += scalar * (τ(i, k, η)*τ(j, k, ξ) + τ(i, k, ξ) * τ(j, k, η))

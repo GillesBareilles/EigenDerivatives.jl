@@ -47,8 +47,19 @@ function D²g_ηl(map::NonLinearMap{Tf}, x, η, l::Int64) where Tf
     return Symmetric((l-1) .* η[l] .* x[l]^(l-2) .* map.As[l])
 end
 
+function D²g_kl(map::NonLinearMap{Tf}, x::Vector{Tf}, k::Int64, l::Int64) where Tf
+    if k == l
+        return Symmetric((l-1) * x[l]^(l-2) .* map.As[l].data)
+    else
+        return Tf(0) .* map.As[1].data
+    end
+end
 
 
+
+################################################################################
+#### Problem instances
+################################################################################
 function get_symmetricmat(Tf, m)
     res = rand(Tf, m, m)
     res .+= res'
