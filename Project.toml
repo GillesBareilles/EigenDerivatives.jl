@@ -10,5 +10,15 @@ GenericSchur = "c145ed77-6b09-5dd9-b285-bf645a82121e"
 Infiltrator = "5903a43b-9cc3-4c30-8d17-598619ec4e9b"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Manifolds = "1cead3c2-87b3-11e9-0ccd-23c62b72b94e"
+PlotsOptim = "57061203-8ea9-4995-b8fb-f2bb2c372b50"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 TimerOutputs = "a759f4b9-e2f1-59dc-863e-4aeb61b1ea8f"
+
+[extras]
+DataStructures = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+PlotsOptim = "57061203-8ea9-4995-b8fb-f2bb2c372b50"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
