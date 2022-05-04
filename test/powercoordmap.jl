@@ -2,7 +2,6 @@ using EigenDerivatives
 using LinearAlgebra
 using Test
 using PlotsOptim
-using Random
 
 include("genericmaptest.jl")
 

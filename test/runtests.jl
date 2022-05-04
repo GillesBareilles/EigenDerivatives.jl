@@ -2,13 +2,10 @@ using Test
 using EigenDerivatives
 using LinearAlgebra
 using PlotsOptim
-using Random
+using DataStructures
 
 include("genericmaptest.jl")
 
-function runtests()
-    # include("test/affinemap.jl")
-    include("test/powercoordmap.jl")
-    # include("test/nonlinearmap.jl")
-    return
-end
+include("affinemap.jl")
+include("powercoordmap.jl")
+include("nonlinearmap.jl")

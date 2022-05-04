@@ -10,7 +10,7 @@ struct AffineMap{Tf} <: AbstractMap{Tf}
     As::Vector{Symmetric{Tf}}
 end
 
-function g(map::AffineMap{Tf}, x::Vector{Tf}) where {Tf}
+function g(map::AffineMap{Tf}, x::Tv) where {Tf, Tv <: AbstractVector{Tf}}
     res = copy(map.A₀.data)
     for i in 1:map.n
         res .+= x[i] .* map.As[i].data
@@ -18,7 +18,7 @@ function g(map::AffineMap{Tf}, x::Vector{Tf}) where {Tf}
     return Symmetric(res)
 end
 
-function Dg(map::AffineMap{Tf}, x::Vector{Tf}, η::Vector{Tf}) where {Tf}
+function Dg(map::AffineMap{Tf}, x::Tv, η::Vector{Tf}) where {Tf, Tv <: AbstractVector{Tf}}
     res = zeros(Tf, size(first(map.As)))
     for i in 1:map.n
         res .+= η[i] .* map.As[i].data
@@ -26,7 +26,7 @@ function Dg(map::AffineMap{Tf}, x::Vector{Tf}, η::Vector{Tf}) where {Tf}
     return Symmetric(res)
 end
 
-function Dgconj(map::AffineMap{Tf}, x::Vector{Tf}, ξ) where {Tf}
+function Dgconj(map::AffineMap{Tf}, x::Tv, ξ) where {Tf, Tv <: AbstractVector{Tf}}
     res = [dot(ξ, Aᵢ) for Aᵢ in map.As]
     return res
 end
@@ -35,7 +35,7 @@ function D²g(map::AffineMap{Tf}, x, η, ξ) where Tf
     return zeros(Tf, size(map.A₀))
 end
 
-function D²g_kl(map::AffineMap{Tf}, x::Vector{Tf}, k::Int64, l::Int64) where {Tf}
+function D²g_kl(map::AffineMap{Tf}, x::Tv, k::Int64, l::Int64) where {Tf, Tv <: AbstractVector{Tf}}
     return Diagonal(Tf(0) * I, size(map.As[1], 1))
 end
 
