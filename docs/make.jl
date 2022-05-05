@@ -1,10 +1,8 @@
 using Documenter
 using EigenDerivatives
 
-makedocs(
-    sitename = "EigenDerivatives",
-    format = Documenter.HTML(),
-    modules = [EigenDerivatives]
+makedocs(;
+    sitename="EigenDerivatives", format=Documenter.HTML(), modules=[EigenDerivatives]
 )
 
 # Documenter can also automatically deploy documentation to gh-pages.

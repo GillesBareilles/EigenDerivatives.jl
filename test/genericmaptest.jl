@@ -1,4 +1,4 @@
-function test_c(A, x::Vector{Tf}, d::Vector{Tf}, name; print_Taylordevs=false) where Tf
+function test_c(A, x::Vector{Tf}, d::Vector{Tf}, name; print_Taylordevs=false) where {Tf}
     φ(t) = x + t * d
     n = length(x)
 
@@ -11,7 +11,7 @@ function test_c(A, x::Vector{Tf}, d::Vector{Tf}, name; print_Taylordevs=false) w
             "t2" => t -> t^2,
             "t3" => t -> t^3,
             "g - 1" => t -> norm(g(A, x + t * d) - g(A, x) - t * Dgxd),
-            "g - 2 - d" => t -> norm(g(A, φ(t)) - g(A, x) - t * Dgxd - 0.5 * t^2 * D²gxd)
+            "g - 2 - d" => t -> norm(g(A, φ(t)) - g(A, x) - t * Dgxd - 0.5 * t^2 * D²gxd),
         )
 
         for l in 1:n
@@ -22,21 +22,20 @@ function test_c(A, x::Vector{Tf}, d::Vector{Tf}, name; print_Taylordevs=false) w
             D2gxl = D²g_ηl(A, x, el, l)
             @test D2gxl ≈ EigenDerivatives.D²g_kl(A, x, l, l)
 
-            model_to_functions["g - 2 - $l"] = (t -> norm(g(A, x + t * el) - g(A, x) - t * Dgxl - 0.5 * t^2 * D2gxl))
+            model_to_functions["g - 2 - $l"] = (
+                t -> norm(g(A, x + t * el) - g(A, x) - t * Dgxl - 0.5 * t^2 * D2gxl)
+            )
         end
 
         if print_Taylordevs
             fig = PlotsOptim.plot_taylordev(model_to_functions; Tf)
-            savefig(fig, "/tmp/$(name)_g_$(Tf)"; savetex = false)
+            savefig(fig, "/tmp/$(name)_g_$(Tf)"; savetex=false)
         end
         res = PlotsOptim.build_affinemodels(model_to_functions; Tf)
 
         @testset "$curve" for (curve, targetslope) in union(
-            [("g - 1", 2.0)],
-            [("g - 2 - $l", 3.0) for l in 1:n],
-            [("g - 2 - d", 3.0)],
+            [("g - 1", 2.0)], [("g - 2 - $l", 3.0) for l in 1:n], [("g - 2 - d", 3.0)]
         )
-
             slope = res[curve][1][1]
             residual = res[curve][2]
             # either the slope is correct or the model is exact, so the residual are the absciss axis.
@@ -46,7 +45,9 @@ function test_c(A, x::Vector{Tf}, d::Vector{Tf}, name; print_Taylordevs=false) w
     end
 end
 
-function test_hinplace(map, x::Vector{Tf}, d::Vector{Tf}, name; print_Taylordevs=false) where Tf
+function test_hinplace(
+    map, x::Vector{Tf}, d::Vector{Tf}, name; print_Taylordevs=false
+) where {Tf}
     φ(t) = x + t * d
 
     eigmult = EigMult(1, 3, x, map)
@@ -58,7 +59,7 @@ function test_hinplace(map, x::Vector{Tf}, d::Vector{Tf}, name; print_Taylordevs
         cx = g(map, x)
         Dcx = Dg(map, x, d)
 
-        hx = zeros(Tf, m);
+        hx = zeros(Tf, m)
         Dhx = zeros(Tf, m)
         Jacₕ = zeros(Tf, m, n)
         h!(hx, eigmult, x, cx)
@@ -83,23 +84,21 @@ function test_hinplace(map, x::Vector{Tf}, d::Vector{Tf}, name; print_Taylordevs
 
         if print_Taylordevs
             fig = PlotsOptim.plot_taylordev(model_to_functions; Tf)
-            savefig(fig, "/tmp/$(name)_hinplace_$(Tf)"; savetex = false)
+            savefig(fig, "/tmp/$(name)_hinplace_$(Tf)"; savetex=false)
         end
         res = PlotsOptim.build_affinemodels(model_to_functions; Tf)
 
-        @testset "curve $curve" for (curve, targetslope) in [
-            ("h differential", 2.0),
-            ("h jacobian", 2.0),
-        ]
+        @testset "curve $curve" for (curve, targetslope) in
+                                    [("h differential", 2.0), ("h jacobian", 2.0)]
             slope = res[curve][1][1]
             residual = res[curve][2]
-            @test  slope >= targetslope - 0.2
-            @test  residual ≈ 0.0 atol = 1e-1
+            @test slope >= targetslope - 0.2
+            @test residual ≈ 0.0 atol = 1e-1
         end
     end
 end
 
-function test_F̃(map, x::Vector{Tf}, d::Vector{Tf}, name; print_Taylordevs = false) where Tf
+function test_F̃(map, x::Vector{Tf}, d::Vector{Tf}, name; print_Taylordevs=false) where {Tf}
     φ(t) = x + t * d
 
     eigmult = EigMult(1, 3, x, map)
@@ -120,23 +119,22 @@ function test_F̃(map, x::Vector{Tf}, d::Vector{Tf}, name; print_Taylordevs = fa
 
         if print_Taylordevs
             fig = PlotsOptim.plot_taylordev(model_to_functions; Tf)
-            savefig(fig, "/tmp/$(name)_Fsmoothext_$(Tf)"; savetex = false)
+            savefig(fig, "/tmp/$(name)_Fsmoothext_$(Tf)"; savetex=false)
         end
         res = PlotsOptim.build_affinemodels(model_to_functions; Tf)
 
-        @testset "curve $curve" for (curve, targetslope) in [
-            ("F smooth extension", 2.0),
-        ]
+        @testset "curve $curve" for (curve, targetslope) in [("F smooth extension", 2.0)]
             slope = res[curve][1][1]
             residual = res[curve][2]
-            @test  slope >= targetslope - 0.2
-            @test  residual ≈ 0.0 atol = 1e-1
+            @test slope >= targetslope - 0.2
+            @test residual ≈ 0.0 atol = 1e-1
         end
     end
-
 end
 
-function test_Linplace(map, x::Vector{Tf}, d::Vector{Tf}, name; print_Taylordevs=false) where Tf
+function test_Linplace(
+    map, x::Vector{Tf}, d::Vector{Tf}, name; print_Taylordevs=false
+) where {Tf}
     φ(t) = x + t * d
 
     eigmult = EigMult(1, 3, x, map)
@@ -172,23 +170,20 @@ function test_Linplace(map, x::Vector{Tf}, d::Vector{Tf}, name; print_Taylordevs
 
         if print_Taylordevs
             fig = PlotsOptim.plot_taylordev(model_to_functions; Tf)
-            savefig(fig, "/tmp/$(name)_Linplace_$(Tf)"; savetex = false)
+            savefig(fig, "/tmp/$(name)_Linplace_$(Tf)"; savetex=false)
         end
         res = PlotsOptim.build_affinemodels(model_to_functions; Tf)
 
-        @testset "curve $curve" for (curve, targetslope) in [
-            ("L - 1", 2.0),
-            ("L - 2", 3.0),
-        ]
+        @testset "curve $curve" for (curve, targetslope) in [("L - 1", 2.0), ("L - 2", 3.0)]
             slope = res[curve][1][1]
             residual = res[curve][2]
-            @test  slope >= targetslope - 0.2
-            @test  residual ≈ 0.0 atol = 1e-1
+            @test slope >= targetslope - 0.2
+            @test residual ≈ 0.0 atol = 1e-1
         end
     end
 end
 
-function test_phi(A, x::Vector{Tf}, d::Vector{Tf}, name; print_Taylordevs=false) where Tf
+function test_phi(A, x::Vector{Tf}, d::Vector{Tf}, name; print_Taylordevs=false) where {Tf}
     φ(t) = x + t * d
 
     eigmult = EigMult(1, 3, x, A)
@@ -208,15 +203,27 @@ function test_phi(A, x::Vector{Tf}, d::Vector{Tf}, name; print_Taylordevs=false)
             "t" => t -> t,
             "t2" => t -> t^2,
             "t3" => t -> t^3,
-            "phi i,j - 1" => t -> norm(ϕᵢⱼ(eigmult, A, φ(t), i, j) - ϕᵢⱼ(eigmult, A, φ(0), i, j) - t * dϕᵢⱼ),
-            "phi k,l - 1" => t -> norm(ϕᵢⱼ(eigmult, A, φ(t), k, l) - ϕᵢⱼ(eigmult, A, φ(0), k, l) - t * dϕₖₗ),
-            "phi i,j - 2" => t -> norm(ϕᵢⱼ(eigmult, A, φ(t), i, j) - ϕᵢⱼ(eigmult, A, φ(0), i, j) - t * dϕᵢⱼ - 0.5 * t^2 * d²ϕᵢⱼ),
-            "phi k,l - 2" => t -> norm(ϕᵢⱼ(eigmult, A, φ(t), k, l) - ϕᵢⱼ(eigmult, A, φ(0), k, l) - t * dϕₖₗ - 0.5 * t^2 * d²ϕₖₗ),
+            "phi i,j - 1" =>
+                t -> norm(
+                    ϕᵢⱼ(eigmult, A, φ(t), i, j) - ϕᵢⱼ(eigmult, A, φ(0), i, j) - t * dϕᵢⱼ
+                ),
+            "phi k,l - 1" =>
+                t -> norm(
+                    ϕᵢⱼ(eigmult, A, φ(t), k, l) - ϕᵢⱼ(eigmult, A, φ(0), k, l) - t * dϕₖₗ
+                ),
+            "phi i,j - 2" =>
+                t -> norm(
+                    ϕᵢⱼ(eigmult, A, φ(t), i, j) - ϕᵢⱼ(eigmult, A, φ(0), i, j) - t * dϕᵢⱼ - 0.5 * t^2 * d²ϕᵢⱼ,
+                ),
+            "phi k,l - 2" =>
+                t -> norm(
+                    ϕᵢⱼ(eigmult, A, φ(t), k, l) - ϕᵢⱼ(eigmult, A, φ(0), k, l) - t * dϕₖₗ - 0.5 * t^2 * d²ϕₖₗ,
+                ),
         )
 
         if print_Taylordevs
             fig = PlotsOptim.plot_taylordev(model_to_functions; Tf)
-            savefig(fig, "/tmp/$(name)_phi_differential_$(Tf)"; savetex = false)
+            savefig(fig, "/tmp/$(name)_phi_differential_$(Tf)"; savetex=false)
         end
         res = PlotsOptim.build_affinemodels(model_to_functions; Tf)
 
@@ -226,7 +233,6 @@ function test_phi(A, x::Vector{Tf}, d::Vector{Tf}, name; print_Taylordevs=false)
             ("phi i,j - 2", 3.0),
             ("phi k,l - 2", 3.0),
         ]
-
             slope = res[curve][1][1]
             residual = res[curve][2]
             @test slope >= targetslope - 0.2
@@ -244,15 +250,29 @@ function test_phi(A, x::Vector{Tf}, d::Vector{Tf}, name; print_Taylordevs=false)
             "t" => t -> t,
             "t2" => t -> t^2,
             "t3" => t -> t^3,
-            "phi i,j - 1" => t -> norm(ϕᵢⱼ(eigmult, A, φ(t), i, j) - ϕᵢⱼ(eigmult, A, φ(0), i, j) - t * cgradᵢⱼ),
-            "phi k,l - 1" => t -> norm(ϕᵢⱼ(eigmult, A, φ(t), k, l) - ϕᵢⱼ(eigmult, A, φ(0), k, l) - t * cgradₖₗ),
-            "phi i,j - 2" => t -> norm(ϕᵢⱼ(eigmult, A, φ(t), i, j) - ϕᵢⱼ(eigmult, A, φ(0), i, j) - t * cgradᵢⱼ - 0.5 * t^2 * chessᵢⱼ),
-            "phi k,l - 2" => t -> norm(ϕᵢⱼ(eigmult, A, φ(t), k, l) - ϕᵢⱼ(eigmult, A, φ(0), k, l) - t * cgradₖₗ - 0.5 * t^2 * chessₖₗ),
+            "phi i,j - 1" =>
+                t -> norm(
+                    ϕᵢⱼ(eigmult, A, φ(t), i, j) - ϕᵢⱼ(eigmult, A, φ(0), i, j) - t * cgradᵢⱼ,
+                ),
+            "phi k,l - 1" =>
+                t -> norm(
+                    ϕᵢⱼ(eigmult, A, φ(t), k, l) - ϕᵢⱼ(eigmult, A, φ(0), k, l) - t * cgradₖₗ,
+                ),
+            "phi i,j - 2" =>
+                t -> norm(
+                    ϕᵢⱼ(eigmult, A, φ(t), i, j) - ϕᵢⱼ(eigmult, A, φ(0), i, j) -
+                    t * cgradᵢⱼ - 0.5 * t^2 * chessᵢⱼ,
+                ),
+            "phi k,l - 2" =>
+                t -> norm(
+                    ϕᵢⱼ(eigmult, A, φ(t), k, l) - ϕᵢⱼ(eigmult, A, φ(0), k, l) -
+                    t * cgradₖₗ - 0.5 * t^2 * chessₖₗ,
+                ),
         )
 
         if print_Taylordevs
             fig = PlotsOptim.plot_taylordev(model_to_functions; Tf)
-            savefig(fig, "/tmp/$(name)_phi_gradient_$(Tf)"; savetex = false)
+            savefig(fig, "/tmp/$(name)_phi_gradient_$(Tf)"; savetex=false)
         end
         res = PlotsOptim.build_affinemodels(model_to_functions; Tf)
 
@@ -262,7 +282,6 @@ function test_phi(A, x::Vector{Tf}, d::Vector{Tf}, name; print_Taylordevs=false)
             ("phi i,j - 2", 3.0),
             ("phi k,l - 2", 3.0),
         ]
-
             slope = res[curve][1][1]
             residual = res[curve][2]
             @test slope >= targetslope - 0.2

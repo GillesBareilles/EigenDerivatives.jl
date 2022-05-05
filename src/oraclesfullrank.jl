@@ -3,7 +3,7 @@ raw"""
 
 Compute the manifold defining map at point `x`, where $c(x)=$`cx`.
 """
-function h!(res::Vector{Tf}, eigmult::EigMult{Tf}, x::Vector{Tf}, cx) where Tf
+function h!(res::Vector{Tf}, eigmult::EigMult{Tf}, x::Vector{Tf}, cx) where {Tf}
     E = U(eigmult, x, cx)
 
     hmat = E' * cx * E
@@ -12,13 +12,14 @@ function h!(res::Vector{Tf}, eigmult::EigMult{Tf}, x::Vector{Tf}, cx) where Tf
     return res
 end
 
-
 raw"""
     $TYPEDSIGNATURES
 
 Compute the differential of the manifold defining map at point `x` along a vector `d` such that `Dc(x)[d] = Dcx`.
 """
-function Dh!(res::T, eigmult::EigMult{Tf}, x::Vector{Tf}, Dcx) where {Tf, T <: AbstractVector{Tf}}
+function Dh!(
+    res::T, eigmult::EigMult{Tf}, x::Vector{Tf}, Dcx
+) where {Tf,T<:AbstractVector{Tf}}
     @assert x == eigmult.x̄
     E = eigmult.Ē
 
@@ -33,7 +34,9 @@ raw"""
 
 Compute the jacobian of the manifold defining map at point `x`.
 """
-function Jacₕ!(res::T, eigmult::EigMult{Tf}, map, x::Vector{Tf}) where {Tf, T<:AbstractMatrix{Tf}}
+function Jacₕ!(
+    res::T, eigmult::EigMult{Tf}, map, x::Vector{Tf}
+) where {Tf,T<:AbstractMatrix{Tf}}
     for i in axes(x, 1)
         resᵢ = @view res[:, i]
         Dcxeᵢ = Dg_l(map, x, i)
@@ -48,8 +51,8 @@ end
 Compute the value of a smooth extension of the maximum eigenvalue relative to
 the set of parameter that make the matrix have the give `eigmult`.
 """
-function F̃(eigmult::EigMult{Tf}, cx) where Tf
-    return sum(eigvals(cx)[end-eigmult.r+1:end]) / eigmult.r
+function F̃(eigmult::EigMult{Tf}, cx) where {Tf}
+    return sum(eigvals(cx)[(end - eigmult.r + 1):end]) / eigmult.r
 end
 
 """
@@ -59,12 +62,14 @@ Compute the gradient of a smooth extension of the maximum eigenvalue relative to
 the set of parameter that make the matrix have the give `eigmult`.
 See [`F̃`](@ref)
 """
-function ∇F̃!(res::T, eigmult::EigMult{Tf}, map, x::Vector{Tf}) where {Tf, T <: AbstractVector{Tf}}
+function ∇F̃!(
+    res::T, eigmult::EigMult{Tf}, map, x::Vector{Tf}
+) where {Tf,T<:AbstractVector{Tf}}
     @assert x == eigmult.x̄
     E = eigmult.Ē
     res .= 0
 
-    for l in axes(res, 1), i in 1:eigmult.r
+    for l in axes(res, 1), i in 1:(eigmult.r)
         res[l] += E[:, i]' * Dg_l(map, x, l) * E[:, i]
     end
     res ./= eigmult.r
@@ -87,21 +92,23 @@ function Lagrangian(eigmult::EigMult{Tf}, map, x::Vector{Tf}, λmult::Vector{Tf}
         i, j = l2ij(l, r)
         λᵢⱼ = λmult[l]
 
-        res += - λᵢⱼ * ϕᵢⱼ(eigmult, map, x, i, j)
+        res += -λᵢⱼ * ϕᵢⱼ(eigmult, map, x, i, j)
     end
     for l in l_partialdiag(r)
         i, j = l2ij(l, r)
         λᵢᵢ = λmult[l]
 
-        res += (1/r - λᵢᵢ) * ϕᵢⱼ(eigmult, map, x, i, j)
+        res += (1 / r - λᵢᵢ) * ϕᵢⱼ(eigmult, map, x, i, j)
     end
 
     i = j = r
-    res += (1/r + trλmult) * ϕᵢⱼ(eigmult, map, x, i, j)
+    res += (1 / r + trλmult) * ϕᵢⱼ(eigmult, map, x, i, j)
     return res
 end
 
-function ∇L!(res::T, eigmult::EigMult{Tf}, map, x::Vector{Tf}, λmult::Vector{Tf}) where {Tf, T<:AbstractVector{Tf}}
+function ∇L!(
+    res::T, eigmult::EigMult{Tf}, map, x::Vector{Tf}, λmult::Vector{Tf}
+) where {Tf,T<:AbstractVector{Tf}}
     @assert x == eigmult.x̄
     r = eigmult.r
     trλmult = sum(λmult[l_partialdiag(r)])
@@ -111,41 +118,40 @@ function ∇L!(res::T, eigmult::EigMult{Tf}, map, x::Vector{Tf}, λmult::Vector{
         i, j = l2ij(l, r)
         λᵢⱼ = λmult[l]
 
-        res .+= - λᵢⱼ * ∇ϕᵢⱼ(eigmult, map, x, i, j)
+        res .+= -λᵢⱼ * ∇ϕᵢⱼ(eigmult, map, x, i, j)
     end
     for l in l_partialdiag(r)
         i, j = l2ij(l, r)
         λᵢᵢ = λmult[l]
 
-        res .+= (1/r - λᵢᵢ) * ∇ϕᵢⱼ(eigmult, map, x, i, j)
+        res .+= (1 / r - λᵢᵢ) * ∇ϕᵢⱼ(eigmult, map, x, i, j)
     end
 
     i = j = r
-    res .+= (1/r + trλmult) * ∇ϕᵢⱼ(eigmult, map, x, i, j)
+    res .+= (1 / r + trλmult) * ∇ϕᵢⱼ(eigmult, map, x, i, j)
     return res
 end
-
-
 
 """
     $TYPEDSIGNATURES
 
 Compute the hessian matrix corresponding to the lagrangian [`Lagrangian`](@ref).
 """
-function ∇²L!(res::T, eigmult::EigMult{Tf}, map, x::Vector{Tf}, λmult::Vector{Tf}, cx) where {Tf, T<:AbstractMatrix{Tf}}
+function ∇²L!(
+    res::T, eigmult::EigMult{Tf}, map, x::Vector{Tf}, λmult::Vector{Tf}, cx
+) where {Tf,T<:AbstractMatrix{Tf}}
     @assert x == eigmult.x̄
     r = eigmult.r
     λs, E = eigen(cx)
     res .= 0
 
     reverse!(λs)
-    reverse!(E, dims = 2)
+    reverse!(E; dims=2)
 
     r = eigmult.r
     m = size(cx, 1)
     n = length(x)
     trλmult = sum(λmult[l_partialdiag(r)])
-
 
     # Precomputing coefficients
     τ = zeros(Tf, r, m, n)
@@ -165,9 +171,9 @@ function ∇²L!(res::T, eigmult::EigMult{Tf}, map, x::Vector{Tf}, λmult::Vecto
             η[k] = 1
 
             res[k, l] = E[:, i]' * D²g_kl(map, x, k, l) * E[:, j]
-            for s in r+1:m
-                scalar = 0.5 * (1/(λs[i] - λs[s]) + 1/(λs[j] - λs[s]))
-                res[k, l] += scalar * (τ[i, s, k]*τ[j, s, l] + τ[i, s, l]*τ[j, s, k])
+            for s in (r + 1):m
+                scalar = 0.5 * (1 / (λs[i] - λs[s]) + 1 / (λs[j] - λs[s]))
+                res[k, l] += scalar * (τ[i, s, k] * τ[j, s, l] + τ[i, s, l] * τ[j, s, k])
             end
         end
     end
@@ -178,19 +184,19 @@ function ∇²L!(res::T, eigmult::EigMult{Tf}, map, x::Vector{Tf}, λmult::Vecto
         λᵢⱼ = λmult[l]
 
         ∇²ϕᵢⱼ!(temp, i, j)
-        res .+= - λᵢⱼ * temp
+        res .+= -λᵢⱼ * temp
     end
     for l in l_partialdiag(r)
         i, j = l2ij(l, r)
         λᵢᵢ = λmult[l]
 
         ∇²ϕᵢⱼ!(temp, i, j)
-        res .+= (1/r - λᵢᵢ) * temp
+        res .+= (1 / r - λᵢᵢ) * temp
     end
     i = j = r
 
     ∇²ϕᵢⱼ!(temp, i, j)
-    res .+= (1/r + trλmult) * temp
+    res .+= (1 / r + trλmult) * temp
 
     return res
 end
