@@ -2,6 +2,7 @@ using EigenDerivatives
 using LinearAlgebra
 using Test
 using PlotsOptim
+using Random
 
 include("genericmaptest.jl")
 
@@ -10,7 +11,9 @@ include("genericmaptest.jl")
         Float64,
         # BigFloat
     ]
-        @testset "k = $k" for k in [1, 2, 4]
+        @testset "k = $k - rnd = $rnd" for k in [1, 2, 4], rnd in 1:5
+            Random.seed!(1346 + rnd)
+
             n, m = 10, 5
             A = get_powercoordmap(; n, m, k, Tf)
             x = rand(Tf, n)

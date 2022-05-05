@@ -38,7 +38,7 @@ function D²g(
     m = map.m
     res = zeros(Tf, m, m)
     for (i, Aᵢ) in enumerate(map.As)
-        res += k * (k - 1) * x[i]^(k - 2) * η[i] * ξ[i] .* Aᵢ.data
+        res .+= k * (k - 1) * x[i]^(k - 2) * η[i] * ξ[i] .* Aᵢ.data
     end
     return Symmetric(res)
 end
@@ -60,7 +60,7 @@ function D²g_kl(map::PowerCoordMap{Tf,e}, x::Vector{Tf}, k::Int64, l::Int64) wh
     if k == l
         return Symmetric(e * (e - 1) * x[l]^(e - 2) .* map.As[l].data)
     else
-        return Tf(0) .* map.As[1].data
+        return Symmetric(zeros(Tf, size(map.As[1].data)))
     end
 end
 
