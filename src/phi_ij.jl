@@ -73,8 +73,8 @@ function ∇²ϕᵢⱼ(
         update_refpoint!(eigmult, map, x)
     end
 
-    gx = @timeit_debug "g oracle" g(map, x)
-    λ, E = @timeit_debug "eigen" eigen(gx)
+    gx = g(map, x)
+    λ, E = eigen(gx)
     reverse!(E; dims=2)
     reverse!(λ)
     τ(i, k, η) = E[:, i]' * Dg(map, x, η) * E[:, k]

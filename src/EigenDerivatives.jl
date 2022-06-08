@@ -4,11 +4,8 @@ using DocStringExtensions
 using LinearAlgebra
 using GenericLinearAlgebra
 using GenericSchur
-using Manifolds
-
 using Random
-using TimerOutputs
-using Infiltrator
+using Manifolds
 
 """
     $TYPEDSIGNATURES
