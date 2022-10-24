@@ -7,11 +7,12 @@ struct AffineMap{Tf} <: AbstractMap{Tf}
     n::Int64
     m::Int64
     A₀::Symmetric{Tf}
-    As::Vector{Symmetric{Tf}}
+    As::Vector{Symmetric{Tf, Matrix{Tf}}}
 end
 
 function g(map::AffineMap{Tf}, x::Tv) where {Tf,Tv<:AbstractVector{Tf}}
-    res = copy(map.A₀.data)
+    res = zeros(Tf, map.m, map.m)
+    res .= map.A₀
     for i in 1:(map.n)
         res .+= x[i] .* map.As[i].data
     end
