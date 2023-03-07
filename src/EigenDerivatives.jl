@@ -5,7 +5,6 @@ using LinearAlgebra
 using GenericLinearAlgebra
 using GenericSchur
 using Random
-using Manifolds
 
 """
     $TYPEDSIGNATURES
@@ -97,7 +96,16 @@ function U(eigmult::EigMult, x, gx)
         E = eigvecs(gx)[:, (end - eigmult.r + 1):end]
         reverse!(E; dims=2)
 
-        return E * project(Stiefel(r, r), E' * eigmult.Ē)
+        # NOTE we do the computation directly to avoid Manifolds.jl dependency
+        # (which causes a big load time, due to invalidations).
+        # The following uses Manifolds.jl projection
+        # res = E * project(Stiefel(r, r), E' * eigmult.Ē)
+
+        # The following is the direct computation
+        s = svd(E' * eigmult.Ē)
+        res = E * (s.U * s.Vt)
+
+        return res
     end
 end
 
