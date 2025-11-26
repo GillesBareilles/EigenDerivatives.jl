@@ -37,17 +37,17 @@ Check by running the test scripts.
 * Principle
 
 - simple case:
-  + $i$-th eigenvalue `λₖ∘g`:
-    #+begin_src julia
+  + $i$-th eigenvalue =λₖ∘g=:
+#+begin_src julia
 
-    #+end_src
+#+end_src
 - $i$-th eigenvalue has multiplicity $r$:
-  + lagrangian derivatives: `L(x, λ) = ∑ₖ₌ᵢʳ λₖ∘g(x)/r + ⟨λ, h(x)⟩`
-    #+begin_src julia
+  + lagrangian derivatives: =L(x, λ) = ∑ₖ₌ᵢʳ λₖ∘g(x)/r + ⟨λ, h(x)⟩=
+#+begin_src julia
 eigm = EigMultiplicity(i, r)
 
 L(eigm, x, λ)
-    #+end_src
+#+end_src
 
 These rely on intermediate objects:
 - smooth basis of coalescing eigenspace =U=
@@ -73,25 +73,25 @@ D²g_ηl(map, x, η, l)
 
 ** functions:
 + ~ϕᵢⱼ~ functions. They are the basic objects from which all other oracles are built.
-  #+begin_src julia
+#+begin_src julia
 ϕᵢⱼ(eigmult, map, x, i, j)
 ∇ϕᵢⱼ(eigmult, map, x, i, j)
 ∇²ϕᵢⱼ(eigmult, map, x, d, i, j)
-  #+end_src
+#+end_src
 + ~h~ function. The set of `x` such that `g(x)` has ith eigenvalue of multiplicity r is defined verifies `h(x) = 0`.
-  #+begin_src julia
+#+begin_src julia
 h(eigmult, map, x)
 Dh(eigmult, map, x)
 Jacₕ(eigmult, map, x)
-  #+end_src
+#+end_src
 + ~λ~ function. The average of eigenvalues i to i+r-1, a smooth function on the set of points such that `h(x) = 0`.
-  #+begin_src julia
+#+begin_src julia
 λ(eigmult, map, x)
 ∇λ(eigmult, map, x)
-  #+end_src
+#+end_src
 + ~L~ function. The lagrangian of the problem `min_x λ(x) s.t. h(x)=0`, defined as `L(x, λ) =  - ⟨λ, h(x)⟩`.
-  #+begin_src julia
+#+begin_src julia
 L(eigmult, map, x, λ)
 ∇L(eigmult, map, x, λ)
 ∇²L(eigmult, map, x, λ, d)
-  #+end_src
+#+end_src
