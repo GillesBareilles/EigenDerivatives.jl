@@ -20,11 +20,11 @@ Intended features:
 # TODO: rewrite this
 
 Possible computations, given a map `g:ℝⁿ → Sₘ(ℝ)` and its derivatives:
-```julia
+#+begin_src julia
 g(map, x)
 Dg(map, x, η)
 D²g(map, x, η)
-```
+#+end_src
 Check out the docs!
 
 * Derivatives status
@@ -38,60 +38,60 @@ Check by running the test scripts.
 
 - simple case:
   + $i$-th eigenvalue `λₖ∘g`:
-    ```julia
+    #+begin_src julia
 
-    ```
+    #+end_src
 - $i$-th eigenvalue has multiplicity $r$:
   + lagrangian derivatives: `L(x, λ) = ∑ₖ₌ᵢʳ λₖ∘g(x)/r + ⟨λ, h(x)⟩`
-    ```julia
-    eigm = EigMultiplicity(i, r)
+    #+begin_src julia
+eigm = EigMultiplicity(i, r)
 
-    L(eigm, x, λ)
-    ```
+L(eigm, x, λ)
+    #+end_src
 
 These rely on intermediate objects:
-- smooth basis of coalescing eigenspace `U`
-- `Uᵢ(x)ᵀ g(x) Uⱼ(x)`
+- smooth basis of coalescing eigenspace =U=
+- =Uᵢ(x)ᵀ g(x) Uⱼ(x)=
 
 * Exposed API
 ** Features
-- variable type precision: `Float64` or `BigFloat`;
+- variable type precision: ~Float64~ or ~BigFloat~;
 - allocation light oracles available, e.g.
-  `∇ϕᵢⱼ!(res, eigmult, map, x, i, j)` instead of `∇ϕᵢⱼ(eigmult, map, x, i, j)`
+  ~∇ϕᵢⱼ!(res, eigmult, map, x, i, j)~ instead of ~∇ϕᵢⱼ(eigmult, map, x, i, j)~
 - functor for hessian computation
 ** objects:
 + ~AbstractMap~ object, with oracles:
-  ```julia
-  g(map, x)
-  Dg(map, x)
-  Dgconj(map, X)
-  D²g_ηl(map, x, η, l)
-  ```
+#+begin_src julia
+g(map, x)
+Dg(map, x)
+Dgconj(map, X)
+D²g_ηl(map, x, η, l)
+#+end_src
 
-+ ~EigMultiplicity~ object, which carries the index and multiplicity of relevant eigenvalue and stores a point `x` and the eigendecomposition of `g(x)`.
++ ~EigMultiplicity~ object, which carries the index and multiplicity of relevant eigenvalue and stores a point ~x~ and the eigendecomposition of ~g(x)~.
   This storage allows to compute eigendecompositions only once per considered point.
 
 ** functions:
 + ~ϕᵢⱼ~ functions. They are the basic objects from which all other oracles are built.
-  ```julia
-  ϕᵢⱼ(eigmult, map, x, i, j)
-  ∇ϕᵢⱼ(eigmult, map, x, i, j)
-  ∇²ϕᵢⱼ(eigmult, map, x, d, i, j)
-  ```
+  #+begin_src julia
+ϕᵢⱼ(eigmult, map, x, i, j)
+∇ϕᵢⱼ(eigmult, map, x, i, j)
+∇²ϕᵢⱼ(eigmult, map, x, d, i, j)
+  #+end_src
 + ~h~ function. The set of `x` such that `g(x)` has ith eigenvalue of multiplicity r is defined verifies `h(x) = 0`.
-  ```julia
-  h(eigmult, map, x)
-  Dh(eigmult, map, x)
-  Jacₕ(eigmult, map, x)
-  ```
+  #+begin_src julia
+h(eigmult, map, x)
+Dh(eigmult, map, x)
+Jacₕ(eigmult, map, x)
+  #+end_src
 + ~λ~ function. The average of eigenvalues i to i+r-1, a smooth function on the set of points such that `h(x) = 0`.
-  ```julia
-  λ(eigmult, map, x)
-  ∇λ(eigmult, map, x)
-  ```
+  #+begin_src julia
+λ(eigmult, map, x)
+∇λ(eigmult, map, x)
+  #+end_src
 + ~L~ function. The lagrangian of the problem `min_x λ(x) s.t. h(x)=0`, defined as `L(x, λ) =  - ⟨λ, h(x)⟩`.
-  ```julia
-  L(eigmult, map, x, λ)
-  ∇L(eigmult, map, x, λ)
-  ∇²L(eigmult, map, x, λ, d)
-  ```
+  #+begin_src julia
+L(eigmult, map, x, λ)
+∇L(eigmult, map, x, λ)
+∇²L(eigmult, map, x, λ, d)
+  #+end_src
